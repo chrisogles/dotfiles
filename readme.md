@@ -14,9 +14,7 @@ To get started with this project on a new machine, follow these steps:
 2. Clone the repository using the following command:
 
 ```
-
 git clone https://github.com/chrisogles/ogilvie-settings.git
-
 ```
 
 ### Connecting to the Repository
@@ -25,9 +23,7 @@ git clone https://github.com/chrisogles/ogilvie-settings.git
 2. Set up the remote repository URL using the following command:
 
 ```
-
 git remote add origin https://github.com/chrisogles/ogilvie-settings.git
-
 ```
 
 ### Pulling the Code
@@ -35,7 +31,13 @@ git remote add origin https://github.com/chrisogles/ogilvie-settings.git
 1. Ensure your local repository is up to date by pulling changes from the remote repository:
 
 ```
-
 git pull origin master
-
 ```
+
+## Linux / TMUX / NVIM Settings
+
+:TODO
+
+## VSCode Settings and Keybindings
+
+:TODO
