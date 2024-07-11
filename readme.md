@@ -39,12 +39,3 @@ git remote add origin https://github.com/chrisogles/ogilvie-settings.git
 git pull origin master
 
 ```
-
-## Contributing
-
-If you'd like to contribute to this project, please follow the [CONTRIBUTING.md](CONTRIBUTING.md) guidelines.
-
-```
-
-You can customize this template with specific details about your project. Let me know if you need any more assistance!
-```
