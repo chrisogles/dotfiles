@@ -9,7 +9,7 @@
 set -o vi
 
 # keybinds
-bind -x '"\C-l":clear'
+# bind -x '"\C-l":clear'
 # ~~~~~~~~~~~~~~~ Environment Variables ~~~~~~~~~~~~~~~~~~~~~~~~
 
 export VISUAL=nvim
@@ -28,7 +28,7 @@ unset MAILCHECK
 
 # ~~~~~~~~~~~~~~~ Path configuration ~~~~~~~~~~~~~~~~~~~~~~~~
 
-PATH="${PATH:+${PATH}:}"$SCRIPTS":"$HOME"/.local/bin:$HOME/dotnet" # appending
+PATH="${PATH:+${PATH}:}$SCRIPTS:$HOME/.local/bin:$HOME/dotnet" # appending
 
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 
@@ -81,13 +81,6 @@ export HISTCONTROL=ignorespace
 #  eval "$(fzf --bash)"
 #fi
 
-# adding keys was buggy, add them outside of the script for now
-#{
-#ssh-add -q ~/.ssh/id_ed25519
-#ssh-add -q ~/.ssh/vanoord
-#ssh-add -q ~/.ssh/delegate
-#} &>/dev/null
-
 # ~~~~~~~~~~~~~~~ Prompt ~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Moved to starship 20-03-2024 for all my prompt needs.
@@ -111,19 +104,18 @@ alias ..="cd .."
 # Repos
 
 alias dot='cd $DOTFILES'
-alias repos='cd $REPOS'
+alias code='cd $REPOS'
 alias solved='cd $REPOS/1-Solved/'
 alias jones='cd $REPOS/2-JonesRadiology/'
 alias config='cd ~/.config/'
 alias c="clear"
 alias onedrive="cd \$ONEDRIVE"
-alias home="cd $HOME"
+alias home="cd ~"
 alias sb="cd $HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Chris\ Brain/"
 
 # ls
 alias ls='ls --color=auto'
 alias ll='ls -la'
-# alias la='exa -laghm@ --all --icons --git --color=always'
 alias la='ls -lathr'
 
 # finds all files recursively and sorts by last modification, ignore hidden files
@@ -131,19 +123,18 @@ alias lastmod='find . -type f -not -path "*/\.*" -exec ls -lrt {} +'
 
 alias sv='sudoedit'
 alias t='tmux'
+alias et='v ~/.tmux.conf'
+alias st='tmux source-file ~/.tmux.conf'
 alias tas='tmux attach-session'
 alias e='exit'
 
 # git
+alias gc='git clone'
 alias gp='git pull'
 alias gs='git status'
 alias lg='lazygit'
-alias gc='git clone'
 
 # ricing
-alias et='v ~/.config/awesome/themes/powerarrow/theme-personal.lua'
-alias ett='v ~/.config/awesome/themes/powerarrow-dark/theme-personal.lua'
-alias er='v ~/.config/awesome/rc.lua'
 alias eb='v ~/.bashrc'
 alias ev='cd ~/.config/nvim/ && v init.lua'
 alias sbr='source ~/.bashrc'
