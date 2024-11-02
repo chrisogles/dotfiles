@@ -14,25 +14,22 @@ To get started with this project on a new machine, follow these steps:
 2. Clone the repository using the following command:
 
 ```
-git clone https://github.com/chrisogles/ogilvie-settings.git
+git clone https://github.com/chrisogles/dotfiles.git
 ```
 
 ### Connecting to the Repository
 
 1. Navigate to the directory where you cloned the repository.
-2. Set up the remote repository URL using the following command:
+
+### Run Stow to install all dotfiles into $HOME directory
+
+1. Run command:
 
 ```
-git remote add origin https://github.com/chrisogles/ogilvie-settings.git
+stow_all.sh
 ```
 
-### Pulling the Code
-
-1. Ensure your local repository is up to date by pulling changes from the remote repository:
-
-```
-git pull origin master
-```
+This will iteratively install the dotfile folders into the home directory.
 
 ## Linux / TMUX / NVIM Settings
 
