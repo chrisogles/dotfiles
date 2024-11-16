@@ -114,9 +114,12 @@ alias home="cd ~"
 alias sb="cd $HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Chris\ Brain/"
 
 # ls
-alias ls='ls --color=auto'
+#alias ls='ls --color=auto'
+alias ls='eza --icons'
 alias ll='ls -la'
-alias la='ls -lathr'
+#alias la='ls -lathr'
+alias la='eza -a -l --icons'
+alias lt='eza -T --icons'
 
 # finds all files recursively and sorts by last modification, ignore hidden files
 alias lastmod='find . -type f -not -path "*/\.*" -exec ls -lrt {} +'
