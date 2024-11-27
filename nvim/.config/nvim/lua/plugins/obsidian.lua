@@ -72,9 +72,11 @@ return {
 
   -- Optional, for templates (see below).
   templates = {
-    subdir = "Templates",
+    subdir = "/Templates",
     date_format = "%Y-%m-%d-%a",
     time_format = "%H:%M",
     tags = "",
+    area = "",
+    project = "",
   },
 }

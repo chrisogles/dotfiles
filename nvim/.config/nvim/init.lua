@@ -5,4 +5,5 @@ require("mason").setup()
 require("nvim-treesitter.install").compilers = { "clang" }
 require("plugins.obsidian")
 
+--require("plugins.zen-mode")
 vim.opt.runtimepath:append("/Users/chrisogilvie/.local/share/nvim/lazy/nvim-treesitter/parser")
