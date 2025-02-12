@@ -132,10 +132,15 @@ alias tas='tmux attach-session'
 alias e='exit'
 
 # git
-alias gc='git clone'
+alias gc='git commit -m'
+alias ga='git add .'
 alias gp='git pull'
+alias gP='git push'
 alias gs='git status'
 alias lg='lazygit'
+alias gS='git switch'
+alias gSn='git switch -c'
+alias gl='git --no-pager log --oneline --parents --graph --all'
 
 # ricing
 alias eb='v ~/.bashrc'
@@ -165,3 +170,5 @@ alias vf='v $(fp)'
 
 ### Install Pomo Timer ###
 complete -C pomo pomo
+
+# exec bash

@@ -141,7 +141,7 @@ Unknown = " "
 Windows = " "
 
 [username]
-show_always = true
+show_always = false
 style_user = "bg:second fg:white"
 style_root = "bg:second fg:white"
 format = '[$user]($style)[](fg:second bg:third)'
@@ -151,7 +151,7 @@ style = "bg:third fg:white"
 format = "[   $path ]($style)($style)[$read_only]($read_only_style)[](fg:third bg:fourth)"
 truncation_symbol = "…/"
 truncate_to_repo = true
-read_only ="  "
+read_only = "  "
 
 [directory.substitutions]
 "Documents" = "  "
@@ -175,7 +175,13 @@ format = '[$symbol($version) ]($style)'
 symbol = " "
 version_format = "${raw}"
 style = "bg:fourth fg:white"
-python_binary = ["./venv/bin/python", "./env/Scripts/python", "python", "python3", "python2"]
+python_binary = [
+  "./venv/bin/python",
+  "./env/Scripts/python",
+  "python",
+  "python3",
+  "python2",
+]
 format = '[$symbol($version)]($style)[ (\($virtualenv\)) ](bg:fourth fg:white)'
 
 [conda]
@@ -229,8 +235,8 @@ format = '([\($all_status$ahead_behind\) ]($style))'
 style = "bold bg:sixth fg:github"
 
 [time]
-disabled = false
-time_format = "%R" # Hour:Minute Format
+disabled = true
+time_format = "%R"                                     # Hour:Minute Format
 style = "bg:seventh fg:white"
 format = '[  $time]($style)[](fg:seventh bg:eighth)'
 
