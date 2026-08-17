@@ -228,11 +228,14 @@ alias tunnel-gateway-007='aws ssm start-session --target i-03a46660b10e7e4d2 \
 
 # ~~~~~~~~~~~~~~~ AWS SSM RDS Tunnel ~~~~~~~~~~~~~~~~~~~~~~~~
 # sdb (Solved DB) — port-forwards the shared RDS instance to localhost:15432.
-# Requires ~/scripts/ssm-tunnel.sh to exist on this machine (see the Ubuntu
-# box's copy for reference — same instance ID / RDS endpoint apply on any
-# machine since it's the same AWS account, just fill in the local script path).
 # After running: psql -h localhost -p 15432 -U <user> -d <client_db>
-alias sdb='~/scripts/ssm-tunnel.sh'
+alias sdb='aws ssm start-session --target i-0d4670513035ba725 \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters "localPortNumber=15432,host=db002.c3mso0q2c8g7.ap-southeast-2.rds.amazonaws.com,portNumber=5432" \
+  --region ap-southeast-2'
+
+# sec2 — start Power BI author workflow
+alias sec2='bash "/Users/chrisogilvie/Library/CloudStorage/GoogleDrive-chris@solved.dev/Shared drives/GDrive - Team Solved/03 - Global Technical/Scripts/start_powerbi_author_workflow.sh"'
 
 # ~~~~~~~~~~~~~~~ SSH Convenience Functions ~~~~~~~~~~~~~~~~~~~~~~~~
 # Shortcuts for local network SSH connections (hosts defined in ~/.ssh/config)
