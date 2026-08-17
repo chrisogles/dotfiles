@@ -1,5 +1,5 @@
 # Git Ignore file for my Dotfiles
 
- 
 /inspodots/
-
+/raycast/
+*.iso
