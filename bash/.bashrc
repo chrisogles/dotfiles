@@ -1,174 +1,197 @@
-#
-# ~/.bashrc
-#
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
 
 # If not running interactively, don't do anything
-[[ $- != *i* ]] && return
+case $- in
+    *i*) ;;
+      *) return;;
+esac
 
-# Set to superior editing mode
-set -o vi
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
 
-# keybinds
-# bind -x '"\C-l":clear'
-# ~~~~~~~~~~~~~~~ Environment Variables ~~~~~~~~~~~~~~~~~~~~~~~~
+# append to the history file, don't overwrite it
+shopt -s histappend
 
-export VISUAL=nvim
-export EDITOR=nvim
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
 
-# config
-export BROWSER="safari"
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
 
-# directories
-export REPOS="$HOME/Code"
-export GITUSER="chrisogilvie"
-export DOTFILES="$REPOS/3-Personal/dotfiles"
-export ONEDRIVE="$HOME/OneDrive"
-# get rid of mail notifications on MacOS
-unset MAILCHECK
+# If set, the pattern "**" used in a pathname expansion context will
+# match all files and zero or more directories and subdirectories.
+#shopt -s globstar
 
-# ~~~~~~~~~~~~~~~ Path configuration ~~~~~~~~~~~~~~~~~~~~~~~~
+# make less more friendly for non-text input files, see lesspipe(1)
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-PATH="${PATH:+${PATH}:}$SCRIPTS:$HOME/.local/bin:$HOME/dotnet" # appending
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
 
-export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
 
-# ~~~~~~~~~~~~~~~ History ~~~~~~~~~~~~~~~~~~~~~~~~
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
 
-export HISTFILE=~/.histfile
-export HISTSIZE=25000
-export SAVEHIST=25000
-export HISTCONTROL=ignorespace
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
 
-# ~~~~~~~~~~~~~~~ Functions ~~~~~~~~~~~~~~~~~~~~~~~~
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
 
-# This function is stolen from rwxrob
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+    ;;
+*)
+    ;;
+esac
 
-# # clone() {
-#   local repo="$1" user
-#   local repo="${repo#https://github.com/}"
-#   local repo="${repo#git@github.com:}"
-#   if [[ $repo =~ / ]]; then
-#     user="${repo%%/*}"
-#   else
-#     user="$GITUSER"
-#     [[ -z "$user" ]] && user="$USER"
-#   fi
-#   local name="${repo##*/}"
-#   local userd="$REPOS/github.com/$user"
-#   local path="$userd/$name"
-#   [[ -d "$path" ]] && cd "$path" && return
-#   mkdir -p "$userd"
-#   cd "$userd"
-#   echo gh repo clone "$user/$name" -- --recurse-submodule
-#   gh repo clone "$user/$name" -- --recurse-submodule
-#   cd "$name"
-# } && export -f clone
-#
-# ~~~~~~~~~~~~~~~ SSH ~~~~~~~~~~~~~~~~~~~~~~~~
-# SSH Script from arch wiki
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
 
-#if ! pgrep -u "$USER" ssh-agent >/dev/null; then
-#  ssh-agent >"$XDG_RUNTIME_DIR/ssh-agent.env"
-#fi
-#if [[ ! "$SSH_AUTH_SOCK" ]]; then
-#  source "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
-#fi
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
 
-# Only run on Ubuntu
+# colored GCC warnings and errors
+#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-#if [[ $(grep -E "^(ID|NAME)=" /etc/os-release | grep -q "ubuntu")$? == 0 ]]; then
-#  eval "$(ssh-agent -s)" >/dev/null
-#  eval "$(fzf --bash)"
-#fi
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
 
-# ~~~~~~~~~~~~~~~ Prompt ~~~~~~~~~~~~~~~~~~~~~~~~
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# Moved to starship 20-03-2024 for all my prompt needs.
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
 
-eval "$(starship init bash)"
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
 
-# ~~~~~~~~~~~~~~~ Aliases ~~~~~~~~~~~~~~~~~~~~~~~~
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+export PATH="$HOME/.local/bin:$PATH"
 
-alias v=nvim
-# alias vim=nvim
+# --- productivity additions (iPad/SSH setup) ---
 
-# ranger
-alias r=ranger
+# bigger history — worth more when typing is slower on a touch keyboard
+HISTSIZE=10000
+HISTFILESIZE=20000
 
-# use FZF for my command History
-alias fh='history | fzf | awk '\''{ $1=""; print substr($0,2) }'\'''
+# fzf: fuzzy history (Ctrl-R) and file search (Ctrl-T) — much faster than
+# typing full paths/commands on an iPad keyboard
+[ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && . /usr/share/doc/fzf/examples/key-bindings.bash
+[ -f /usr/share/doc/fzf/examples/completion.bash ] && . /usr/share/doc/fzf/examples/completion.bash
 
-# cd
-alias ..="cd .."
+# bat is installed as `batcat` on Debian/Ubuntu due to a name clash
+command -v batcat >/dev/null 2>&1 && alias bat='batcat' && alias cat='batcat --paging=never'
 
-# Repos
+# fd is installed as `fdfind` on Debian/Ubuntu due to a name clash
+command -v fdfind >/dev/null 2>&1 && alias fd='fdfind'
 
-alias dot='cd $DOTFILES'
-alias code='cd $REPOS'
-alias solved='cd $REPOS/1-Solved/'
-alias jones='cd $REPOS/2-JonesRadiology/'
-alias config='cd ~/.config/'
-alias c="clear"
-alias onedrive="cd \$ONEDRIVE"
-alias home="cd ~"
-alias sb="cd $HOME/Library/Mobile\ Documents/iCloud~md~obsidian/Documents/Chris\ Brain/"
+# eza (better ls) if present, else fall back to exa
+if command -v eza >/dev/null 2>&1; then
+    alias ls='eza --group-directories-first'
+    alias ll='eza -alF --group-directories-first'
+    alias la='eza -A'
+    alias lt='eza --tree --level=2'
+elif command -v exa >/dev/null 2>&1; then
+    alias ls='exa --group-directories-first'
+    alias ll='exa -alF --group-directories-first'
+    alias la='exa -A'
+    alias lt='exa --tree --level=2'
+fi
 
-# ls
-#alias ls='ls --color=auto'
-alias ls='eza --icons'
-alias ll='ls -la'
-#alias la='ls -lathr'
-alias la='eza -a -l --icons'
-alias lt='eza -T --icons'
-
-# finds all files recursively and sorts by last modification, ignore hidden files
-alias lastmod='find . -type f -not -path "*/\.*" -exec ls -lrt {} +'
-
-alias sv='sudoedit'
-alias t='tmux'
-alias et='v ~/.tmux.conf'
-alias st='tmux source-file ~/.tmux.conf'
-alias tas='tmux attach-session'
-alias e='exit'
-
-# git
-alias gc='git commit -m'
-alias ga='git add .'
-alias gp='git pull'
-alias gP='git push'
-alias gs='git status'
 alias lg='lazygit'
-alias gS='git switch'
-alias gSn='git switch -c'
-alias gl='git --no-pager log --oneline --parents --graph --all'
 
-# ricing
-alias eb='v ~/.bashrc'
-alias ev='cd ~/.config/nvim/ && v init.lua'
-alias sbr='source ~/.bashrc'
-alias s='startx'
+# `cheat lazygit` / `cheat fzf` -- open a quick-reference cheatsheet, no
+# context switch away from the terminal
+cheat() {
+    local sheet="$HOME/.cheatsheets/$1.md"
+    if [ -z "$1" ]; then
+        echo "Available cheatsheets:"
+        ls "$HOME/.cheatsheets" | sed 's/\.md$//'
+    elif [ -f "$sheet" ]; then
+        command -v batcat >/dev/null 2>&1 && batcat --paging=always --style=plain "$sheet" || less "$sheet"
+    else
+        echo "No cheatsheet for '$1'. Available:"
+        ls "$HOME/.cheatsheets" | sed 's/\.md$//'
+    fi
+}
+alias vim='nvim'
+alias vi='nvim'
+alias v='nvim'
 
-# vim & second brain
-alias in="cd \$ZETTELKASTEN/0 Inbox/"
-alias zk="cd \$ZETTELKASTEN"
+# quick shell/bashrc management
+alias sb='source ~/.bashrc'
+alias eb='nvim ~/.bashrc'
 
-# starting programmes
-alias cards='python3 /opt/homebrew/lib/python3.11/site-packages/mtg_proxy_printer/'
+alias c='clear'
+alias ..='cd ..'
+alias ...='cd ../..'
 
-# terraform
-alias tf='terraform'
-alias tp='terraform plan'
+alias gs='git status -sb'
+alias gd='git diff'
 
-# fun
-alias fishies=asciiquarium
+alias et='nvim ~/.tmux.conf'
+alias ev='cd ~/.config/nvim/ && nvim init.lua'
 
-# fzf aliases
-# use fp to do a fzf search and preview the files
-alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
-# search for a file with fzf and open it in vim
-alias vf='v $(fp)'
+# zoxide: `z <partial dir name>` jumps to frecent directories — saves a lot
+# of typing full paths on an iPad keyboard
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
 
-### Install Pomo Timer ###
-complete -C pomo pomo
+# starship prompt
+command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
 
-# exec bash
+# Auto-attach to a persistent tmux session on login over SSH, so a dropped
+# iPad connection never loses your work — reattaches to "main" if it
+# exists, creates it otherwise. Skipped for non-interactive/already-tmux
+# shells, and for VS Code / other embedded terminals.
+if command -v tmux >/dev/null 2>&1 && [ -n "$SSH_CONNECTION" ] && [ -z "$TMUX" ] && [ -z "$VSCODE_INJECTION" ]; then
+    tmux attach -t main 2>/dev/null || tmux new -s main
+fi
