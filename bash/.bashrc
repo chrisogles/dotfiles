@@ -123,10 +123,27 @@ export PATH="$HOME/.local/bin:$PATH"
 HISTSIZE=10000
 HISTFILESIZE=20000
 
-# fzf: fuzzy history (Ctrl-R) and file search (Ctrl-T) — much faster than
-# typing full paths/commands on an iPad keyboard
-[ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && . /usr/share/doc/fzf/examples/key-bindings.bash
-[ -f /usr/share/doc/fzf/examples/completion.bash ] && . /usr/share/doc/fzf/examples/completion.bash
+# fzf: fuzzy history (Ctrl-R), file search (Ctrl-T), cd (Alt-C) — much faster
+# than typing full paths/commands on an iPad keyboard.
+# Paths vary by distro/install method, so probe rather than hardcode:
+#   Ubuntu 24.04 apt : key-bindings in /usr/share/doc/fzf/examples,
+#                      completion moved to /usr/share/bash-completion/completions/fzf
+#   Debian/older     : both under /usr/share/doc/fzf/examples
+#   git/brew install : `fzf --bash` emits both (fzf >= 0.48)
+if command -v fzf >/dev/null 2>&1; then
+    if fzf --bash >/dev/null 2>&1; then
+        eval "$(fzf --bash)"
+    else
+        for _f in /usr/share/doc/fzf/examples/key-bindings.bash \
+                  /usr/share/doc/fzf/examples/completion.bash \
+                  /usr/share/bash-completion/completions/fzf \
+                  /opt/homebrew/opt/fzf/shell/key-bindings.bash \
+                  /opt/homebrew/opt/fzf/shell/completion.bash; do
+            [ -f "$_f" ] && . "$_f"
+        done
+        unset _f
+    fi
+fi
 
 # bat is installed as `batcat` on Debian/Ubuntu due to a name clash
 command -v batcat >/dev/null 2>&1 && alias bat='batcat' && alias cat='batcat --paging=never'
@@ -192,10 +209,19 @@ command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
 # starship prompt
 command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
 
+# Machine-specific config: per-box PATH entries, host-only aliases, anything
+# that shouldn't be committed. Untracked, so this repo stays identical across
+# machines. Sourced before the tmux block so a box can opt out of auto-attach.
+[ -f ~/.bashrc.local ] && . ~/.bashrc.local
+
 # Auto-attach to a persistent tmux session on login over SSH, so a dropped
 # iPad connection never loses your work — reattaches to "main" if it
 # exists, creates it otherwise. Skipped for non-interactive/already-tmux
-# shells, and for VS Code / other embedded terminals.
-if command -v tmux >/dev/null 2>&1 && [ -n "$SSH_CONNECTION" ] && [ -z "$TMUX" ] && [ -z "$VSCODE_INJECTION" ]; then
-    tmux attach -t main 2>/dev/null || tmux new -s main
+# shells, for VS Code / other embedded terminals, and for dumb terminals
+# (scp, rsync, some editor remote pickers) which tmux can't run in.
+if command -v tmux >/dev/null 2>&1 && [ -n "${SSH_CONNECTION:-}" ] && [ -z "${TMUX:-}" ] \
+   && [ -z "${VSCODE_INJECTION:-}" ] && [ -z "${NO_TMUX_AUTOATTACH:-}" ] \
+   && [ "${TERM:-dumb}" != "dumb" ]; then
+    # -A = attach if "main" exists, create it otherwise (atomic, no race)
+    tmux new-session -A -s main
 fi
