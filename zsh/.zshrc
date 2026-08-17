@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 #
 # ~/.zshrc
 #
@@ -17,7 +24,37 @@ fi
 # Source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Set to superior editing mode
+# Add in Zinit Plugins
+zinit ice depth=1; zinit light romkatv/powerlevel10k
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-autosuggestions
+
+# Add in snippits
+zinit snippet OMZP::git
+zinit snippet OMZP::sudo
+zinit snippet OMZP::aws
+zinit snippet OMZP::command-not-found
+
+# fzf keybindings (Ctrl+R, Ctrl+T) — must be before fzf-tab
+eval "$(fzf --zsh)"
+
+# Autoload Completions (must be after zsh-completions, before fzf-tab)
+autoload -U compinit && compinit
+
+zinit cdreplay -q
+
+# fzf-tab must load after compinit
+zinit light Aloxaf/fzf-tab
+
+# Tab accepts autosuggestion, Ctrl+F triggers fzf-tab completion
+bindkey '^I' autosuggest-accept
+bindkey '^F' fzf-tab-complete
+
+# Zoxide (smarter cd)
+eval "$(zoxide init --cmd cd zsh)"
+
+# # Set to superior editing mode
 set -o vi
 
 # ~~~~~~~~~~~~~~~ Environment Variables ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -50,7 +87,18 @@ export HISTSIZE=25000
 export SAVEHIST=25000
 setopt HIST_IGNORE_SPACE
 setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_all_DUPS
 setopt SHARE_HISTORY
+setopt APPENDHISTORY
+setopt hist_save_no_dups
+setopt hist_find_no_dups
+
+bindkey '^p' history-search-backward
+bindkey '^n' history-search-forward
+
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+zstyle ':completion:*' menu no
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 
 # ~~~~~~~~~~~~~~~ NVM ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -60,7 +108,7 @@ export NVM_DIR="$HOME/.nvm"
 
 # ~~~~~~~~~~~~~~~ Prompt ~~~~~~~~~~~~~~~~~~~~~~~~
 
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
 
 # ~~~~~~~~~~~~~~~ Aliases ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -180,11 +228,14 @@ alias tunnel-gateway-007='aws ssm start-session --target i-03a46660b10e7e4d2 \
 
 # ~~~~~~~~~~~~~~~ AWS SSM RDS Tunnel ~~~~~~~~~~~~~~~~~~~~~~~~
 # sdb (Solved DB) — port-forwards the shared RDS instance to localhost:15432.
-# Requires ~/scripts/ssm-tunnel.sh to exist on this machine (see the Ubuntu
-# box's copy for reference — same instance ID / RDS endpoint apply on any
-# machine since it's the same AWS account, just fill in the local script path).
 # After running: psql -h localhost -p 15432 -U <user> -d <client_db>
-alias sdb='~/scripts/ssm-tunnel.sh'
+alias sdb='aws ssm start-session --target i-0d4670513035ba725 \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters "localPortNumber=15432,host=db002.c3mso0q2c8g7.ap-southeast-2.rds.amazonaws.com,portNumber=5432" \
+  --region ap-southeast-2'
+
+# sec2 — start Power BI author workflow
+alias sec2='bash "/Users/chrisogilvie/Library/CloudStorage/GoogleDrive-chris@solved.dev/Shared drives/GDrive - Team Solved/03 - Global Technical/Scripts/start_powerbi_author_workflow.sh"'
 
 # ~~~~~~~~~~~~~~~ SSH Convenience Functions ~~~~~~~~~~~~~~~~~~~~~~~~
 # Shortcuts for local network SSH connections (hosts defined in ~/.ssh/config)
@@ -203,3 +254,6 @@ function ssh-run() {
     fi
     ssh "$1" "${@:2}"
 }
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
