@@ -36,8 +36,12 @@ return {
     incremental_selection = {
       enable = true,
       keymaps = {
-        init_selection = "<C-space>",
-        node_incremental = "<C-space>",
+        -- NOT <C-space> (the LazyVim default): that's the tmux prefix, so
+        -- tmux swallows it and nvim never sees the key. <M-space> is free in
+        -- both — tmux only claims M-H/M-L at the root, and Ghostty is set to
+        -- macos-option-as-alt so Option+Space sends Meta on the Mac too.
+        init_selection = "<M-space>",
+        node_incremental = "<M-space>",
         scope_incremental = false,
         node_decremental = "<bs>",
       },

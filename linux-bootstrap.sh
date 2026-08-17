@@ -37,7 +37,8 @@ echo "==> Installing apt packages"
 sudo apt-get update
 sudo apt-get install -y \
   git tmux fzf bat ripgrep fd-find zoxide stow \
-  nodejs npm python3-venv build-essential curl tar
+  nodejs npm python3-venv build-essential curl tar \
+  mosh
 
 # eza replaced exa; package name differs by distro age. Try eza, fall back to exa.
 if ! command -v eza >/dev/null 2>&1 && ! command -v exa >/dev/null 2>&1; then
@@ -137,6 +138,27 @@ fi
 tmux new-session -d -s _bootstrap 2>/dev/null || true
 "$HOME/.tmux/plugins/tpm/bin/install_plugins" || true
 tmux kill-session -t _bootstrap 2>/dev/null || true
+
+# The systemd unit is INSTALLED, not stowed, and is deliberately absent from
+# STOW_PACKAGES. systemd treats a symlinked unit as "linked", and
+# `systemctl --user enable` then rewrites its symlink farm and deletes the stow
+# symlink, leaving a dangling .wants entry and a unit reporting "not-found".
+# See the unit file's header for the other trap (the tmux.service name clash
+# with tmux-continuum).
+echo "==> Installing the persistent-tmux systemd user unit"
+if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+  install -Dm644 "$DOTFILES_DIR/systemd/.config/systemd/user/tmux-main.service" \
+    "$HOME/.config/systemd/user/tmux-main.service"
+  # Without lingering, the user manager only runs while you're logged in — so
+  # the session wouldn't exist at boot, which is the entire point.
+  loginctl enable-linger "$USER" 2>/dev/null || \
+    sudo loginctl enable-linger "$USER" 2>/dev/null || \
+    echo "!! Could not enable lingering — the session won't start until first login"
+  systemctl --user daemon-reload
+  systemctl --user enable --now tmux-main.service
+else
+  echo "   (no systemd — skipping)"
+fi
 
 echo "==> Bootstrapping nvim plugins (this can take a minute)"
 # `+Lazy! sync` returns as soon as the plugin clones finish, so +qa kills

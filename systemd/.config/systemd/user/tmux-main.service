@@ -1,0 +1,51 @@
+# Keep the "main" tmux session alive across reboots.
+#
+# Linux-only (systemd). Requires lingering, so the user manager starts at boot
+# rather than at first login:  loginctl enable-linger $USER
+#
+# The SSH auto-attach in bash/.bashrc uses `tmux new-session -A -s main`, so it
+# attaches to whatever this unit already created instead of racing it.
+#
+# --- Two traps this file exists to avoid, both learned the hard way ---
+#
+# 1. NAME. Do not call this tmux.service. tmux-continuum claims that exact
+#    name for its own @continuum-boot feature, and because @continuum-boot
+#    defaults to 'off' its hook runs `systemctl --user disable tmux.service`
+#    every time the tmux config is sourced. A unit called tmux.service gets
+#    silently disabled again and again, with nothing in the journal to explain
+#    why it stopped starting at boot.
+#
+# 2. INSTALL, DON'T STOW. This file must be copied into
+#    ~/.config/systemd/user/, not symlinked there by stow. systemd classifies a
+#    symlinked unit as "linked", and `systemctl --user enable` then rewrites
+#    its symlink farm and deletes the stow symlink, leaving a dangling
+#    .wants entry and a unit that reports "not-found". linux-bootstrap.sh
+#    installs it with `install -Dm644` for this reason, and the systemd folder
+#    is deliberately NOT in that script's stow list.
+#
+# Install and enable:
+#   install -Dm644 ~/dotfiles/systemd/.config/systemd/user/tmux-main.service \
+#     ~/.config/systemd/user/tmux-main.service
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now tmux-main.service
+
+[Unit]
+Description=tmux persistent "main" session
+Documentation=man:tmux(1)
+After=default.target
+
+[Service]
+# NOT Type=forking: the tmux server fully daemonizes (double-fork + setsid), so
+# systemd never finds a main process to track and the unit sits there until the
+# 90s start timeout fires, then gets killed. oneshot + RemainAfterExit models
+# this correctly — "run a command, then consider the unit active".
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/tmux new-session -d -s main
+ExecStop=/usr/bin/tmux kill-session -t main
+# The tmux server outlives ExecStart, so don't let systemd sweep the cgroup
+# when ExecStart returns.
+KillMode=process
+
+[Install]
+WantedBy=default.target
