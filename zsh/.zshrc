@@ -44,8 +44,12 @@ autoload -U compinit && compinit
 
 zinit cdreplay -q
 
-# fzf-tab must load after compinit (overrides tab to use fzf)
+# fzf-tab must load after compinit
 zinit light Aloxaf/fzf-tab
+
+# Tab accepts autosuggestion, Ctrl+F triggers fzf-tab completion
+bindkey '^I' autosuggest-accept
+bindkey '^F' fzf-tab-complete
 
 # Zoxide (smarter cd)
 eval "$(zoxide init --cmd cd zsh)"
