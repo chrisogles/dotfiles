@@ -166,6 +166,14 @@ alias tunnel-gateway-007='aws ssm start-session --target i-03a46660b10e7e4d2 \
   --parameters "portNumber=3389,localPortNumber=13389" \
   --region ap-southeast-2'
 
+# ~~~~~~~~~~~~~~~ AWS SSM RDS Tunnel ~~~~~~~~~~~~~~~~~~~~~~~~
+# sdb (Solved DB) — port-forwards the shared RDS instance to localhost:15432.
+# Requires ~/scripts/ssm-tunnel.sh to exist on this machine (see the Ubuntu
+# box's copy for reference — same instance ID / RDS endpoint apply on any
+# machine since it's the same AWS account, just fill in the local script path).
+# After running: psql -h localhost -p 15432 -U <user> -d <client_db>
+alias sdb='~/scripts/ssm-tunnel.sh'
+
 # ~~~~~~~~~~~~~~~ SSH Convenience Functions ~~~~~~~~~~~~~~~~~~~~~~~~
 # Shortcuts for local network SSH connections (hosts defined in ~/.ssh/config)
 
