@@ -18,8 +18,8 @@ for folder in */; do
   # Remove trailing slash to get folder name
   folder_name="${folder%/}"
 
-  # Skip the 'inspodots' folder
-  if [ "$folder_name" == "inspodots" ]; then
+  # Skip non-config folders
+  if [ "$folder_name" == "inspodots" ] || [ "$folder_name" == "raycast" ]; then
     echo "Skipping: $folder_name"
     continue
   fi
