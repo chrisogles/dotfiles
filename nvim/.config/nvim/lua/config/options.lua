@@ -29,7 +29,9 @@ opt.smartcase = true -- if you include mixed case in your search, assumes you wa
 -- cursor line
 opt.cursorline = false -- highlight the current cursor line
 
-vim.g.mkdp_browser = "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
+if vim.fn.has("macunix") == 1 then
+  vim.g.mkdp_browser = "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"
+end
 
 vim.g.lazygit_config = false
 
