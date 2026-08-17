@@ -181,6 +181,10 @@ alias gd='git diff'
 alias et='nvim ~/.tmux.conf'
 alias ev='cd ~/.config/nvim/ && nvim init.lua'
 
+# sdb (Solved DB) — SSM tunnel to the shared RDS instance (localhost:15432).
+# After running: psql -h localhost -p 15432 -U <user> -d <client_db>
+alias sdb='~/scripts/ssm-tunnel.sh'
+
 # zoxide: `z <partial dir name>` jumps to frecent directories — saves a lot
 # of typing full paths on an iPad keyboard
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
