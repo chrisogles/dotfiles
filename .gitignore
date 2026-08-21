@@ -3,3 +3,4 @@
 /inspodots/
 /raycast/
 *.iso
+psql/.pgpass

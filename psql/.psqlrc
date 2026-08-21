@@ -1,0 +1,24 @@
+\set QUIET 1
+
+\timing on
+\x auto
+\pset null '␀'
+\pset linestyle unicode
+\pset border 2
+\set COMP_KEYWORD_CASE upper
+\set ON_ERROR_ROLLBACK interactive
+\set VERBOSITY verbose
+
+-- per-database history, so ↑ in the RSA db shows RSA queries
+\set HISTFILE ~/.psql_history-:DBNAME
+\set HISTSIZE 10000
+
+\setenv PAGER 'pspg -X -b --no-mouse'
+\setenv EDITOR 'nvim'
+
+-- named queries: type :peek and hit enter
+\set peek 'SELECT * FROM :t ORDER BY 1 DESC LIMIT 100;'
+\set act 'SELECT pid, state, now()-query_start AS dur, left(query,80) FROM pg_stat_activity WHERE state <> ''idle'' ORDER BY dur DESC;'
+\set bigt 'SELECT relname, pg_size_pretty(pg_total_relation_size(c.oid)) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE relkind=''r'' ORDER BY pg_total_relation_size(c.oid) DESC LIMIT 20;'
+
+\unset QUIET
