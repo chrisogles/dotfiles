@@ -57,6 +57,21 @@ Neovim comes from the **official stable tarball**, not apt: Ubuntu 24.04
 ships 0.9.5 and this config needs 0.10+ for `blink.cmp`. Since `.bashrc`
 aliases `vim`/`vi`/`v` to `nvim`, an apt neovim costs you your editor too.
 
+## Omarchy (Arch + Hyprland)
+
+Omarchy boxes use `omarchy/apply.sh`, **not** `linux-bootstrap.sh`:
+
+```
+cd ~/.dotfiles/omarchy && ./apply.sh
+```
+
+Omarchy owns `~/.bashrc` (it activates mise, so replacing it costs you
+`claude`/`gh`/`node`), `~/.config/tmux/tmux.conf` and `~/.config/nvim`, so that
+script appends marker-delimited blocks and merges the nvim specs instead of
+stowing over them. Hardware tuning for the 2013 MacBook Air lives in
+`omarchy/hardware/macbook-air-6-1.sh`. See `omarchy/README.md` for the full
+list, what's deliberately excluded, and the hibernation warning.
+
 ### Machine-specific config: ~/.bashrc.local
 
 The stowed `~/.bashrc` sources `~/.bashrc.local` at the end if it exists.
