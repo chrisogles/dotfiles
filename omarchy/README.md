@@ -58,6 +58,37 @@ symlinking over them.
   Omarchy preinstalls that go unused.
 - **Power profiles** — `balanced` on AC, `power-saver` on battery.
 
+## Dictation
+
+`dictation-setup.sh` installs Voxtype with smart cleanup — the Wispr Flow shape of
+thing, arranged so it works on a 4 GB machine.
+
+```
+~/.dotfiles/omarchy/dictation-setup.sh     # needs sudo for the package install
+```
+
+- **Keys** come from Omarchy's defaults and appear once voxtype is installed:
+  **F9** held for push-to-talk, **Super+Ctrl+X** to toggle.
+- **Local transcription**: whisper `base.en` (142 MB) via whisper.cpp, which uses
+  this CPU's AVX2/FMA. `tiny.en` is the faster fallback.
+- **`on_demand_loading = true`** is the setting that makes this viable: the model
+  loads while you hold the key and is dropped afterwards. Voxtype was removed from
+  this laptop originally for holding ~200 MB resident as an idle daemon.
+- **Cleanup through the `claude` CLI** (Haiku) in `files/voxtype-cleanup.sh`:
+  punctuation, capitalisation, filler and false-start removal. The documented
+  recipe for this is a local Ollama model, which on 4 GB would swap and take
+  longer than typing; remote inference costs one short-lived process instead.
+  tiny/base whisper models emit no punctuation of their own, so this pass is what
+  makes the output prose rather than a transcript.
+- **It never eats your words.** Any failure — no network, timeout, empty reply, or
+  a reply suspiciously longer than the input (a sign the model answered instead of
+  cleaning) — falls back to the raw transcript with a local sed tidy-up.
+- **The model rewrites, never responds.** A dictated question comes out as that
+  question. This is tested, not assumed.
+- **Privacy switch**: `touch ~/.config/voxtype/no-llm` drops to local-only cleanup
+  with nothing leaving the machine; delete the file to restore. Worth knowing that
+  in LLM mode, dictated text goes to Anthropic for cleanup.
+
 ## Hardware-specific
 
 `hardware/macbook-air-6-1.sh` is for the 2013 MacBook Air (`MacBookAir6,1`,

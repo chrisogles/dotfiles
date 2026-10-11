@@ -1,0 +1,72 @@
+# Voxtype configuration — tuned for a low-spec laptop with smart cleanup.
+#
+# Installed by omarchy/dictation-setup.sh, which replaces __HOME__ with the real
+# home directory (TOML does no variable expansion).
+#
+# The two decisions that matter here:
+#   whisper.on_demand_loading  — the model is loaded when you press the key and
+#     dropped afterwards, so an idle daemon costs tens of MB instead of ~200.
+#   output.post_process        — raw whisper output through an LLM for punctuation,
+#     capitalisation and filler removal. tiny/base models have no punctuation of
+#     their own, so this is what makes dictation usable rather than a transcript.
+
+state_file = "auto"
+
+[hotkey]
+# Hyprland owns the keys (F9 push-to-talk, Super+Ctrl+X toggle) via Omarchy's
+# default bindings, which appear automatically when voxtype is installed.
+enabled = false
+
+[audio]
+device = "default"
+sample_rate = 16000
+# 60s is the stock limit; 180 allows dictating a paragraph without being cut off.
+max_duration_secs = 180
+pause_media = true
+
+[audio.feedback]
+# A short beep matters more than usual here: transcription on this CPU isn't
+# instant, so you need to know recording actually started.
+enabled = true
+theme = "subtle"
+volume = 0.6
+
+[whisper]
+# base.en (142 MB) is the starting point. If dictation feels slow, switch to
+# tiny.en (75 MB, roughly 1.4x faster) — the LLM pass hides most of the accuracy
+# difference on everyday speech. Technical jargon is where base.en earns its keep.
+model = "base.en"
+language = "en"
+translate = false
+
+# Load the model per-recording instead of holding it resident.
+on_demand_loading = true
+
+# 2 physical cores / 4 threads. Left to auto-detection deliberately; pinning it
+# to 4 on a 2-core chip slowed transcription in practice.
+# threads = 4
+
+[output]
+# "type" sends keystrokes at the cursor (via wtype on Wayland); clipboard is the
+# fallback when an app refuses synthetic input.
+mode = "type"
+fallback_to_clipboard = true
+type_delay_ms = 1
+
+[output.post_process]
+command = "__HOME__/.local/bin/voxtype-cleanup.sh"
+# 15s: the script itself times the LLM out at 12s and falls back to the raw
+# transcript, so this only has to be the looser of the two bounds.
+timeout_ms = 15000
+trim = true
+# Empty LLM output must never silently eat a dictation.
+fallback_on_empty = true
+
+[output.notification]
+on_recording_start = false
+on_recording_stop = false
+on_transcription = false
+
+[text]
+# Works even in local-only mode: say "new paragraph", "comma", "full stop".
+spoken_punctuation = true
